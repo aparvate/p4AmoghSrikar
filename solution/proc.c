@@ -17,7 +17,6 @@ static struct proc *initproc;
 int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
-int STRIDE1; // Stride 1
 
 //Globals
 int global_tickets;
@@ -94,6 +93,9 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->pass = 0;
+  p->tickets = 8;
+  p->stride = STRIDE1 / tickets;
 
   release(&ptable.lock);
 

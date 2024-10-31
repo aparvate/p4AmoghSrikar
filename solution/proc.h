@@ -32,6 +32,8 @@ struct context {
   uint eip;
 };
 
+#define STRIDE1 1<<10; // Stride 1
+
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
