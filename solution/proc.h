@@ -49,6 +49,9 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  int pass;                    // Initially set to 0, gets updated everytime process runs
+  int tickets;                 // Default = 8. Modified by syscall
+  int stride;                  // stride = STRIDE1 / Tickets.
 };
 
 // Process memory is laid out contiguously, low addresses first:

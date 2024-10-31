@@ -17,6 +17,12 @@ static struct proc *initproc;
 int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
+int STRIDE1; // Stride 1
+
+//Globals
+int global_tickets;
+int global_stride;
+int global_pass;
 
 static void wakeup1(void *chan);
 
