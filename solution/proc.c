@@ -352,26 +352,55 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    int minPass = 1000000;
+    int processId = -1;
+    int processRuntime = -1;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
+      c->proc = p;
+      switchuvm(p);
+      if (p->pass > minPass) {
+        minPass = p->pass;
+        processId = p->pid;
+        processRuntime = p->rtime;
+      }
+      else{
+        if (p->rtime < processRuntime){
+          minPass = p->pass;
+          processId = p->pid;
+          processRuntime = p->rtime;
+        }
+        else{
+          if (p->pid > processId){
+            minPass = p->pass;
+            processId = p->pid;
+            processRuntime = p->rtime;
+          }
+        }
+      }
+    }
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)
+        continue;
+      if (p->pid == processId){
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+        global_pass += global_stride;
 
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        p->pass += p->stride;
+        global_pass += global_stride;
+        c->proc = 0;
+      }
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-      global_pass += global_stride;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      p->pass += p->stride;
-      global_pass += global_stride;
-      c->proc = 0;
     }
     release(&ptable.lock);
 
