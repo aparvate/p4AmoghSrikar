@@ -89,3 +89,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int sys_settickets(void){
+	return 0;
+}
+
+int sys_getpinfo(void){
+	return 0;
+}
