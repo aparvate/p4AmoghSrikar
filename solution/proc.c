@@ -384,6 +384,9 @@ scheduler(void)
       if(p->state != RUNNABLE)
         continue;
       if (p->pid == processId){
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
@@ -398,9 +401,6 @@ scheduler(void)
         global_pass += global_stride;
         c->proc = 0;
       }
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
     }
     release(&ptable.lock);
 
