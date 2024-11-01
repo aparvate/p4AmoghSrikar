@@ -357,6 +357,7 @@ scheduler(void)
 
       // Process is done running for now.
       // It should have changed its p->state before coming back.
+      p->pass += p->stride;
       c->proc = 0;
     }
     release(&ptable.lock);
