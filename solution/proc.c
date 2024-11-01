@@ -158,6 +158,7 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
+  global_tickets += p->tickets;
 
   release(&ptable.lock);
 }
@@ -224,6 +225,7 @@ fork(void)
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
+  global_tickets += p->tickets;
 
   release(&ptable.lock);
 
@@ -470,8 +472,10 @@ wakeup1(void *chan)
   struct proc *p;
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
+    if(p->state == SLEEPING && p->chan == chan){
+      global_tickets += p->tickets;
       p->state = RUNNABLE;
+    }  
 }
 
 // Wake up all processes sleeping on chan.
@@ -498,6 +502,7 @@ kill(int pid)
       // Wake process from sleep if necessary.
       if(p->state == SLEEPING)
         p->state = RUNNABLE;
+        global_tickets += p->tickets;
       release(&ptable.lock);
       return 0;
     }
