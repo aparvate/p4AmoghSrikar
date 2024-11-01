@@ -359,8 +359,7 @@ scheduler(void)
       if(p->state != RUNNABLE)
         continue;
       c->proc = p;
-      switchuvm(p);
-      if (p->pass > minPass) {
+      if (p->pass < minPass) {
         minPass = p->pass;
         processId = p->pid;
         processRuntime = p->rtime;
