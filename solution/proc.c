@@ -458,6 +458,9 @@ sleep(void *chan, struct spinlock *lk)
     acquire(&ptable.lock);  //DOC: sleeplock1
     release(lk);
   }
+
+  p->remain = p->pass - global_pass;
+
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
@@ -491,8 +494,12 @@ wakeup1(void *chan)
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if(p->state == SLEEPING && p->chan == chan){
+      p->pass = global_pass + p->remain;
+      p->remain = 0;  
+
       global_tickets += p->tickets;
       p->state = RUNNABLE;
+      global_stride = STRIDE1 / global_tickets;
     }  
 }
 
