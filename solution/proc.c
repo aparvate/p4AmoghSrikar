@@ -95,7 +95,8 @@ found:
   p->pid = nextpid++;
   p->pass = 0;
   p->tickets = 8;
-  p->stride = STRIDE1 / p->tickets;
+  p->stride = STRIDE1/p->tickets;
+  p->remain = 0;
 
   release(&ptable.lock);
 

@@ -54,6 +54,7 @@ struct proc {
   int pass;                    // Initially set to 0, gets updated everytime process runs
   int tickets;                 // Default = 8. Modified by syscall
   int stride;                  // stride = STRIDE1 / Tickets.
+  int remain;                  // remain for each process
 };
 
 // Process memory is laid out contiguously, low addresses first:
