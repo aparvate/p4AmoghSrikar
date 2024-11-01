@@ -97,7 +97,7 @@ found:
   p->tickets = 8;
   p->stride = STRIDE1/p->tickets;
   p->remain = 0;
-  global_tickets -= p->tickets;
+  global_tickets += p->tickets;
 
   release(&ptable.lock);
 
@@ -159,7 +159,6 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
-  global_tickets += p->tickets;
 
   release(&ptable.lock);
 }
@@ -307,7 +306,6 @@ wait(void)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
-        global_tickets -= p->tickets;
         release(&ptable.lock);
         return pid;
       }
@@ -355,7 +353,7 @@ scheduler(void)
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
-      global_tickets += p->tickets;
+      global_pass += global_stride;
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
@@ -479,7 +477,6 @@ wakeup1(void *chan)
     if(p->state == SLEEPING && p->chan == chan){
       global_tickets += p->tickets;
       p->state = RUNNABLE;
-      global_tickets += p->tickets;
     }  
 }
 
@@ -507,12 +504,12 @@ kill(int pid)
       // Wake process from sleep if necessary.
       if(p->state == SLEEPING)
         p->state = RUNNABLE;
-        global_tickets += p->tickets;
       release(&ptable.lock);
       return 0;
     }
   }
   release(&ptable.lock);
+  global_tickets -= p->tickets;
   return -1;
 }
 
