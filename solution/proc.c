@@ -19,9 +19,9 @@ extern void forkret(void);
 extern void trapret(void);
 
 //Globals
-int global_tickets;
-int global_stride;
-int global_pass;
+int global_tickets = 0;
+int global_stride = 0;
+int global_pass = 0;
 
 static void wakeup1(void *chan);
 
@@ -98,6 +98,7 @@ found:
   p->stride = STRIDE1/p->tickets;
   p->remain = 0;
   global_tickets += p->tickets;
+  global_stride = STRIDE1/global_tickets;
 
   release(&ptable.lock);
 
@@ -226,6 +227,7 @@ fork(void)
 
   np->state = RUNNABLE;
   global_tickets += np->tickets;
+  global_stride = STRIDE1/global_tickets;
 
   release(&ptable.lock);
 
@@ -452,6 +454,12 @@ sleep(void *chan, struct spinlock *lk)
   p->chan = chan;
   p->state = SLEEPING;
   global_tickets -= p->tickets;
+  if (global_tickets == 0){
+    global_stride = 0;
+  }
+  else{
+    global_stride = STRIDE1/global_tickets;
+  }
 
   sched();
 
@@ -510,6 +518,12 @@ kill(int pid)
   }
   release(&ptable.lock);
   global_tickets -= p->tickets;
+  if (global_tickets == 0){
+    global_stride = 0;
+  }
+  else{
+    global_stride = STRIDE1/global_tickets;
+  }
   return -1;
 }
 
