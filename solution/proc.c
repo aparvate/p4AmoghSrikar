@@ -355,7 +355,7 @@ scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     int minPass = INT_MAX;
-    struct proc *chosenProc = -1;
+    struct proc *chosenProc = 0;
 
     #ifdef RR
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
