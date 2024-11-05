@@ -9,8 +9,6 @@
 #include "pstat.h"
 #include <limits.h> 
 
-#define STRIDE1 1<<10 // Stride 1
-
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -408,7 +406,6 @@ scheduler(void)
         // Update the process's pass value after it has run
         chosenProc->pass += chosenProc->stride;
         chosenProc->rtime = chosenProc->rtime + 1;
-
         // Reset CPU's proc pointer to null after the process yields or finishes
         c->proc = 0;
       }
