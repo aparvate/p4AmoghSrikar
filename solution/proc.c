@@ -165,6 +165,7 @@ userinit(void)
 
   p->state = RUNNABLE;
   p->pass = global_pass + p->remain;
+  global_pass += p->tickets;
 
   release(&ptable.lock);
 }
