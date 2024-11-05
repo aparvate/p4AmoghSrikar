@@ -95,13 +95,16 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  //p->pass = global_pass;
-  p->pass = 0;
+
+  p->rtime = 0;
+  p->pass = global_pass;
   p->tickets = 8;
   p->stride = STRIDE1/p->tickets;
-  p->remain = 0;
-  global_tickets += p->tickets;
-  global_stride = STRIDE1/global_tickets;
+  
+
+  p->remain = p -> stride;
+  //global_tickets += p->tickets;
+  //global_stride = STRIDE1/global_tickets;
 
   release(&ptable.lock);
 
@@ -229,7 +232,7 @@ fork(void)
 
   acquire(&ptable.lock);
 
-  np->tickets = 8;          
+  np->tickets = curproc->tickets;          
   np->stride = STRIDE1 / np->tickets;     
   np->pass = global_pass;                
   np->remain = 0;
