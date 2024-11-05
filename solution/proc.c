@@ -621,10 +621,10 @@ procdump(void)
 
 int ticketsHelper(int n) {
   struct proc* p = myproc();
-  if (p == 0 ||  p->state != RUNNABLE) {
+  if (p == 0 ) {
     return -1;
   }
-  if (n < 1 || n > (1 << 5)){
+  if (n < 1 || n > (1<<5)){
     n = 8;
   }
 
