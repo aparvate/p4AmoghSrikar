@@ -163,6 +163,7 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
+  p->pass = global_pass;
 
   release(&ptable.lock);
 }
@@ -451,6 +452,7 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
+  myproc()->pass += myproc()->stride;
   sched();
   release(&ptable.lock);
 }
