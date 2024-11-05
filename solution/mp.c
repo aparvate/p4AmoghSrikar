@@ -7,8 +7,8 @@
 #include "param.h"
 #include "memlayout.h"
 #include "mp.h"
-#include "mmu.h"
 #include "x86.h"
+#include "mmu.h"
 #include "proc.h"
 
 struct cpu cpus[NCPU];

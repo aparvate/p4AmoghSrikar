@@ -3,9 +3,6 @@
 #include "user.h"
 #include "pstat.h"
 #include "fcntl.h"
-#include "mmu.h"
-#include "x86.h"
-#include "proc.h"
 
 #define INITIAL_PROCESSES 10
 #define ADDITIONAL_PROCESSES 6
