@@ -95,7 +95,8 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->pass = global_pass;
+  //p->pass = global_pass;
+  p->pass = 0;
   p->tickets = 8;
   p->stride = STRIDE1/p->tickets;
   p->remain = 0;
@@ -621,7 +622,7 @@ procdump(void)
 
 int ticketsHelper(int n) {
   struct proc* p = myproc();
-  if (p == 0 ) {
+  if (p == 0) {
     return -1;
   }
   if (n < 1 || n > (1<<5)){
