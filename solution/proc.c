@@ -9,6 +9,8 @@
 #include "pstat.h"
 #include <limits.h> 
 
+#define STRIDE1 1<<10 // Stride 1
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -394,21 +396,20 @@ scheduler(void)
       }
 
       // If a suitable process was found, run it
-      if (chosenProc) {
-        c->proc = chosenProc;
-        switchuvm(chosenProc);
-        chosenProc->state = RUNNING;
+      c->proc = chosenProc;
+      switchuvm(chosenProc);
+      chosenProc->state = RUNNING;
 
-        // Perform context switch
-        swtch(&(c->scheduler), chosenProc->context);
-        switchkvm();
+      // Perform context switch
+      swtch(&(c->scheduler), chosenProc->context);
+      switchkvm();
 
-        // Update the process's pass value after it has run
-        chosenProc->pass += chosenProc->stride;
+      // Update the process's pass value after it has run
+      chosenProc->pass += chosenProc->stride;
+      chosenProc->rtime = chosenProc->rtime + 1;
 
-        // Reset CPU's proc pointer to null after the process yields or finishes
-        c->proc = 0;
-      }
+      // Reset CPU's proc pointer to null after the process yields or finishes
+      c->proc = 0;
     #endif
 
     release(&ptable.lock);
