@@ -395,7 +395,7 @@ scheduler(void)
       }
 
       // If a suitable process was found, run it
-      if (chosenProc != 0) {
+      if (chosenProc) {
         c->proc = chosenProc;
         switchuvm(chosenProc);
         chosenProc->state = RUNNING;
