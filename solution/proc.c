@@ -229,7 +229,7 @@ fork(void)
 
   acquire(&ptable.lock);
 
-  np->tickets = curproc->tickets;          
+  np->tickets = 8;          
   np->stride = STRIDE1 / np->tickets;     
   np->pass = global_pass;                
   np->remain = 0;
