@@ -96,7 +96,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   //p->pass = global_pass;
-  p->pass = 0;
+  p->pass = global_pass;
   p->tickets = 8;
   p->stride = STRIDE1/p->tickets;
   p->remain = 0;
