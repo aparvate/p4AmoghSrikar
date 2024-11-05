@@ -373,6 +373,7 @@ scheduler(void)
         switchkvm();
 
         p->pass += p->stride;
+        p->rtime = p->rtime + 1;
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
