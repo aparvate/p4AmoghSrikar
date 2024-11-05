@@ -354,8 +354,6 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    int minPass = INT_MAX;
-    struct proc *chosenProc = 0;
 
     #ifdef RR
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -380,6 +378,8 @@ scheduler(void)
         c->proc = 0;
       }
     #elif STRIDE
+      int minPass = INT_MAX;
+      struct proc *chosenProc = 0;
       // Find the process with the lowest pass value, breaking ties by runtime and pid
       for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
         if (p->state != RUNNABLE)
