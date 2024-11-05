@@ -99,7 +99,8 @@ found:
   p->pass = global_pass;
   p->tickets = 8;
   p->stride = STRIDE1/p->tickets;
-  p->remain = 0;
+  p->remain = p->stride;
+
   global_tickets += p->tickets;
   global_stride = STRIDE1/global_tickets;
 
