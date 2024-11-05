@@ -164,7 +164,7 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
-  p->pass = global_pass;
+  p->pass = global_pass + p->remain;
 
   release(&ptable.lock);
 }
