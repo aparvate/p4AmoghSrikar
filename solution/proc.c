@@ -96,13 +96,12 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   //p->pass = global_pass;
-  p->rtime = 0;
-  p->pass = global_pass;
+  p->pass = 0;
   p->tickets = 8;
   p->stride = STRIDE1/p->tickets;
-  p->remain = p->stride;
-  //global_tickets += p->tickets;
-  //global_stride = STRIDE1/global_tickets;
+  p->remain = 0;
+  global_tickets += p->tickets;
+  global_stride = STRIDE1/global_tickets;
 
   release(&ptable.lock);
 
@@ -165,8 +164,6 @@ userinit(void)
 
   p->state = RUNNABLE;
   p->pass = global_pass;
-  global_tickets += p->tickets;
-  global_pass += global_stride;
 
   release(&ptable.lock);
 }
@@ -232,12 +229,16 @@ fork(void)
 
   acquire(&ptable.lock);
 
-  np->state = RUNNABLE;
+  np->tickets = curproc->tickets;          
+  np->stride = STRIDE1 / np->tickets;     
+  np->pass = global_pass;                
+  np->remain = 0;
+  np->rtime = 0;
 
-  np->pass = np->remain + global_pass;
-  global_tickets += np->tickets;     
+  global_tickets += np->tickets;         
   global_stride = STRIDE1 / global_tickets;
-  global_pass += global_stride; 
+
+  np->state = RUNNABLE;
 
   release(&ptable.lock);
 
@@ -378,7 +379,7 @@ scheduler(void)
         // It should have changed its p->state before coming back.
         c->proc = 0;
       }
-    #elif defined(STRIDE)
+    #elif STRIDE
       int minPass = INT_MAX;
       struct proc *chosenProc = 0;
       // Find the process with the lowest pass value, breaking ties by runtime and pid
@@ -411,9 +412,8 @@ scheduler(void)
         // Reset CPU's proc pointer to null after the process yields or finishes
         c->proc = 0;
       }
-    #else
-      exit();
     #endif
+
     release(&ptable.lock);
   }
 }
@@ -507,7 +507,6 @@ sleep(void *chan, struct spinlock *lk)
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
-
   global_tickets -= p->tickets;
   if (global_tickets == 0){
     global_stride = 0;
@@ -515,9 +514,6 @@ sleep(void *chan, struct spinlock *lk)
   else{
     global_stride = STRIDE1/global_tickets;
   }
-  global_stride = STRIDE1 / global_tickets;
-  global_pass += global_stride; 
-  p->remain = p->pass - global_pass;
 
   sched();
 
@@ -541,10 +537,11 @@ wakeup1(void *chan)
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if(p->state == SLEEPING && p->chan == chan){
+      p->pass = global_pass + p->remain;
+      p->remain = 0;  
+
+      global_tickets += p->tickets;
       p->state = RUNNABLE;
-      global_pass += global_stride; 
-      p->pass = p->remain + global_pass;
-      global_tickets += p->tickets;     
       global_stride = STRIDE1 / global_tickets;
     }  
 }
@@ -573,12 +570,6 @@ kill(int pid)
       // Wake process from sleep if necessary.
       if(p->state == SLEEPING)
         p->state = RUNNABLE;
-      else{
-        global_pass += global_stride;
-        global_tickets -= p->tickets;     
-        global_stride = STRIDE1 / global_tickets;
-        p->remain = global_pass + p->pass;
-      }
       release(&ptable.lock);
       return 0;
     }
