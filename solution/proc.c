@@ -102,7 +102,7 @@ found:
   p->remain = p->stride;
 
   global_tickets += p->tickets;
-  global_stride = STRIDE1/global_tickets;
+  //global_stride = STRIDE1/global_tickets;
 
   release(&ptable.lock);
 
