@@ -355,7 +355,7 @@ scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     int minPass = INT_MAX;
-    struct proc *chosenProc = 0;
+    struct proc *chosenProc = -1;
 
     #ifdef RR
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -395,7 +395,7 @@ scheduler(void)
       }
 
       // If a suitable process was found, run it
-      if (chosenProc) {
+      if (chosenProc != 0) {
         c->proc = chosenProc;
         switchuvm(chosenProc);
         chosenProc->state = RUNNING;
