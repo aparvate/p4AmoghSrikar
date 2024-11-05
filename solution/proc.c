@@ -379,7 +379,7 @@ scheduler(void)
         // It should have changed its p->state before coming back.
         c->proc = 0;
       }
-    #elif defined(STRIDE)
+    #elif STRIDE
       // Find the process with the lowest pass value, breaking ties by runtime and pid
       for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
         if (p->state != RUNNABLE)
