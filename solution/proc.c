@@ -372,7 +372,7 @@ scheduler(void)
         swtch(&(c->scheduler), p->context);
         switchkvm();
 
-        / p->pass += p->stride;
+        // p->pass += p->stride;
         p->rtime = p->rtime + 1;
 
         // Process is done running for now.
