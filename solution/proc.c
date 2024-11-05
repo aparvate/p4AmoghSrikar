@@ -372,7 +372,7 @@ scheduler(void)
         swtch(&(c->scheduler), p->context);
         switchkvm();
 
-        p->pass += p->stride;
+        / p->pass += p->stride;
         p->rtime = p->rtime + 1;
 
         // Process is done running for now.
@@ -407,7 +407,7 @@ scheduler(void)
         switchkvm();
 
         // Update the process's pass value after it has run
-        chosenProc->pass += chosenProc->stride;
+        // chosenProc->pass += chosenProc->stride;
         chosenProc->rtime = chosenProc->rtime + 1;
         // Reset CPU's proc pointer to null after the process yields or finishes
         c->proc = 0;
