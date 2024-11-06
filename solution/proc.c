@@ -7,7 +7,9 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "pstat.h"
-#include <limits.h> 
+#include "traps.h"
+
+uint ticks;
 
 struct {
   struct spinlock lock;
@@ -164,7 +166,7 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
-  global_pass += p->tickets;
+  global_pass += global_stride;
   p->pass = global_pass + p->remain;
 
   release(&ptable.lock);
@@ -666,4 +668,12 @@ int getpinfo(struct pstat *ps) {
   release(&ptable.lock);
 
   return 0;
+}
+
+void global_pass_update(void){
+  static int lastUpdated = 0;
+  int timeGone;
+  timeGone = ticks - lastUpdated;
+  lastUpdated += timeGone;
+  global_pass += (global_stride * timeGone);
 }
