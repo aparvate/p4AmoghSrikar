@@ -454,7 +454,6 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
-  myproc()->pass += myproc()->stride;
   sched();
   release(&ptable.lock);
 }
