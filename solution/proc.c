@@ -172,8 +172,8 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
+  global_pass_update();
   p->pass = global_pass + p->remain;
-  global_pass += p->tickets;
 
   release(&ptable.lock);
 }
@@ -245,6 +245,7 @@ fork(void)
   np->remain = 0;
   np->rtime = 0;
 
+  global_pass_update();
   global_tickets += np->tickets;         
   global_stride = (STRIDE1) / global_tickets;
 
@@ -517,6 +518,7 @@ sleep(void *chan, struct spinlock *lk)
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
+  global_pass_update();
   global_tickets -= p->tickets;
   if (global_tickets == 0){
     global_stride = 0;
@@ -549,7 +551,7 @@ wakeup1(void *chan)
     if(p->state == SLEEPING && p->chan == chan){
       p->pass = global_pass + p->remain;
       p->remain = 0;  
-
+      global_pass_update();
       global_tickets += p->tickets;
       p->state = RUNNABLE;
       global_stride = (STRIDE1) / global_tickets;
@@ -578,8 +580,10 @@ kill(int pid)
     if(p->pid == pid){
       p->killed = 1;
       // Wake process from sleep if necessary.
-      if(p->state == SLEEPING)
+      if(p->state == SLEEPING){
         p->state = RUNNABLE;
+        global_pass_update();
+      }
       release(&ptable.lock);
       return 0;
     }
