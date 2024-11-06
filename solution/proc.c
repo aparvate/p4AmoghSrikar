@@ -26,6 +26,7 @@ int global_stride = 0;
 int global_pass = 0;
 
 static void wakeup1(void *chan);
+static int lastUpdated = 0;
 
 void
 pinit(void)
@@ -131,7 +132,6 @@ found:
 }
 
 void global_pass_update(void){
-  static int lastUpdated = 0;
   int timeGone;
   timeGone = ticks - lastUpdated;
   lastUpdated += timeGone;
