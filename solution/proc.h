@@ -13,7 +13,6 @@ struct cpu {
 
 extern struct cpu cpus[NCPU];
 extern int ncpu;
-extern uint ticks;
 
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
