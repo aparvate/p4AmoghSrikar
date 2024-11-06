@@ -7,7 +7,6 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "pstat.h"
-#include "traps.h"
 
 uint ticks;
 
