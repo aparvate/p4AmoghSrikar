@@ -575,10 +575,9 @@ kill(int pid)
     if(p->pid == pid){
       p->killed = 1;
       // Wake process from sleep if necessary.
-      if(p->state == SLEEPING) {
+      if(p->state == SLEEPING) 
         p->state = RUNNABLE;
-        global_pass_update();
-      }
+      global_pass_update();
       release(&ptable.lock);
       return 0;
     }
