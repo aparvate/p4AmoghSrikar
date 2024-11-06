@@ -9,8 +9,6 @@
 #include "pstat.h"
 #include "traps.h"
 
-uint ticks;
-
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
