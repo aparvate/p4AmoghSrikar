@@ -270,3 +270,9 @@ slipdays.txt # optional
 - ["Stride Scheduling: Deterministic Proportional-Share Resource Management" by Carl A. Waldspurger and William E. Weihl. Technical Memo MIT/LCS/TM-528, MIT Laboratory for Computer Science, June 1995.](https://dl.acm.org/action/downloadSupplement?doi=10.5555%2F889650&file=mit___artificial_intelligence_laboratory_tm-528.ps)
 - [OSTEP Chapter 9: Scheduling: Proportional Share.](https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-sched-lottery.pdf)
   Discusses concepts related to proportional-share scheduling algorithms.
+
+The advantage of stride scheduling is that processes with more tickets are scheduled more frequently. Processes with higher tickets accumulate runtime faster due to their higher scheduling frequency. Because of this prioritization there is a direct correlation between ticket count and runtime growth.
+
+In RR scheduling, tickets are not looked at and all processes accumilate runtime at a similar rate. This equal allocation ensures fairness but ignores individual process priority, making it less suitable for workloads where certain tasks are more critical or time-sensitive.
+
+In summary, stride scheduling offers a clear advantage in environments with mixed-priority tasks by dynamically prioritizing high-ticket processes, ensuring that critical tasks complete faster. Round-robin scheduling provides simplicity and fairness, but it lacks responsiveness to priority needs and is less efficient in dynamically changing workloads. Stride scheduling’s adaptive behavior to process priority is beneficial in real-world scenarios where tasks have varying levels of urgency.
