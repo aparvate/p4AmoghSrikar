@@ -132,6 +132,14 @@ found:
   return p;
 }
 
+void global_pass_update(void){
+  static int lastUpdated = 0;
+  int timeGone;
+  timeGone = ticks - lastUpdated;
+  lastUpdated += timeGone;
+  global_pass += (global_stride * timeGone);
+}
+
 //PAGEBREAK: 32
 // Set up first user process.
 void
@@ -673,12 +681,4 @@ int getpinfo(struct pstat *ps) {
   release(&ptable.lock);
 
   return 0;
-}
-
-void global_pass_update(void){
-  static int lastUpdated = 0;
-  int timeGone;
-  timeGone = ticks - lastUpdated;
-  lastUpdated += timeGone;
-  global_pass += (global_stride * timeGone);
 }
