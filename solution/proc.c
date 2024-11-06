@@ -7,6 +7,9 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "pstat.h"
+#include "traps.h"
+
+uint ticks;
 
 struct {
   struct spinlock lock;
@@ -97,11 +100,11 @@ found:
   //p->pass = global_pass;
   p->pass = global_pass;
   p->tickets = 8;
-  p->stride = STRIDE1/8;
+  p->stride = (STRIDE1)/p->tickets;
   p->remain = p->stride;
 
   global_tickets += p->tickets;
-  global_stride = STRIDE1/global_tickets;
+  global_stride = (STRIDE1)/global_tickets;
 
   release(&ptable.lock);
 
@@ -163,7 +166,7 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
-  global_pass += global_stride;
+  global_pass_update();
   p->pass = global_pass + p->remain;
 
   release(&ptable.lock);
@@ -231,13 +234,14 @@ fork(void)
   acquire(&ptable.lock);
 
   np->tickets = 8;          
-  np->stride = STRIDE1 / 8;     
+  np->stride = (STRIDE1) / np->tickets;     
   np->pass = global_pass;                
   np->remain = 0;
   np->rtime = 0;
 
+  global_pass_update();
   global_tickets += np->tickets;         
-  global_stride = STRIDE1 / global_tickets;
+  global_stride = (STRIDE1) / global_tickets;
 
   np->state = RUNNABLE;
 
@@ -453,6 +457,7 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
+  myproc()->pass += myproc()->stride;
   sched();
   release(&ptable.lock);
 }
@@ -507,12 +512,13 @@ sleep(void *chan, struct spinlock *lk)
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
+  global_pass_update();
   global_tickets -= p->tickets;
   if (global_tickets == 0){
     global_stride = 0;
   }
   else{
-    global_stride = STRIDE1/global_tickets;
+    global_stride = (STRIDE1)/global_tickets;
   }
 
   sched();
@@ -540,9 +546,10 @@ wakeup1(void *chan)
       p->pass = global_pass + p->remain;
       p->remain = 0;  
 
+      global_pass_update();
       global_tickets += p->tickets;
       p->state = RUNNABLE;
-      global_stride = STRIDE1 / global_tickets;
+      global_stride = (STRIDE1) / global_tickets;
     }  
 }
 
@@ -568,8 +575,10 @@ kill(int pid)
     if(p->pid == pid){
       p->killed = 1;
       // Wake process from sleep if necessary.
-      if(p->state == SLEEPING) 
+      if(p->state == SLEEPING) {
         p->state = RUNNABLE;
+        global_pass_update();
+      }
       release(&ptable.lock);
       return 0;
     }
@@ -580,7 +589,7 @@ kill(int pid)
     global_stride = 0;
   }
   else{
-    global_stride = STRIDE1/global_tickets;
+    global_stride = (STRIDE1)/global_tickets;
   }
   return -1;
 }
@@ -640,8 +649,8 @@ int ticketsHelper(int n) {
   global_tickets += p->tickets;
 
   
-  p->stride = STRIDE1 / p->tickets;
-  global_stride = STRIDE1 / global_tickets;
+  p->stride = (STRIDE1) / p->tickets;
+  global_stride = (STRIDE1) / global_tickets;
   release(&ptable.lock);
 
   return 0;
