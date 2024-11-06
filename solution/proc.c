@@ -638,8 +638,9 @@ int ticketsHelper(int n) {
   p->tickets = n;
   global_tickets += p->tickets;
 
-  
+  p->oldStride = p->stride;
   p->stride = STRIDE1 / p->tickets;
+  p->pass += global_pass + p->remain * (p->stride/p->oldStride);
   global_stride = STRIDE1 / global_tickets;
   release(&ptable.lock);
 

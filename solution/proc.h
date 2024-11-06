@@ -59,6 +59,7 @@ struct proc {
   int stride;                  // stride = STRIDE1 / Tickets.
   int remain;                  // remain for each process
   int rtime;                   // rtime for procs
+  int oldStride;               // old stride when dynamically updating
 };
 
 // Process memory is laid out contiguously, low addresses first:
