@@ -98,11 +98,11 @@ found:
   //p->pass = global_pass;
   p->pass = global_pass;
   p->tickets = 8;
-  p->stride = STRIDE1/8;
+  p->stride = (STRIDE1)/p->tickets;
   p->remain = p->stride;
 
   global_tickets += p->tickets;
-  global_stride = STRIDE1/global_tickets;
+  global_stride = (STRIDE1)/global_tickets;
 
   release(&ptable.lock);
 
@@ -232,13 +232,13 @@ fork(void)
   acquire(&ptable.lock);
 
   np->tickets = 8;          
-  np->stride = STRIDE1 / 8;     
+  np->stride = (STRIDE1) / np->tickets;     
   np->pass = global_pass;                
   np->remain = 0;
   np->rtime = 0;
 
   global_tickets += np->tickets;         
-  global_stride = STRIDE1 / global_tickets;
+  global_stride = (STRIDE1) / global_tickets;
 
   np->state = RUNNABLE;
 
@@ -514,7 +514,7 @@ sleep(void *chan, struct spinlock *lk)
     global_stride = 0;
   }
   else{
-    global_stride = STRIDE1/global_tickets;
+    global_stride = (STRIDE1)/global_tickets;
   }
 
   sched();
@@ -544,7 +544,7 @@ wakeup1(void *chan)
 
       global_tickets += p->tickets;
       p->state = RUNNABLE;
-      global_stride = STRIDE1 / global_tickets;
+      global_stride = (STRIDE1) / global_tickets;
     }  
 }
 
@@ -582,7 +582,7 @@ kill(int pid)
     global_stride = 0;
   }
   else{
-    global_stride = STRIDE1/global_tickets;
+    global_stride = (STRIDE1)/global_tickets;
   }
   return -1;
 }
@@ -642,8 +642,8 @@ int ticketsHelper(int n) {
   global_tickets += p->tickets;
 
   
-  p->stride = STRIDE1 / p->tickets;
-  global_stride = STRIDE1 / global_tickets;
+  p->stride = (STRIDE1) / p->tickets;
+  global_stride = (STRIDE1) / global_tickets;
   release(&ptable.lock);
 
   return 0;
