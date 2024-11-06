@@ -33,7 +33,7 @@ pinit(void)
   initlock(&ptable.lock, "ptable");
 }
 
-// Must be called with interrupts disabled
+
 int
 cpuid() {
   return mycpu()-cpus;
@@ -362,7 +362,6 @@ scheduler(void)
   c->proc = 0;
 
   for (;;) {
-    // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
@@ -373,32 +372,22 @@ scheduler(void)
         if(p->state != RUNNABLE)
           continue;
 
-        // Switch to chosen process.  It is the process's job
-        // to release ptable.lock and then reacquire it
-        // before jumping back to us.
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
 
         swtch(&(c->scheduler), p->context);
         switchkvm();
-
-        // p->pass += p->stride;
         p->rtime = p->rtime + 1;
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
         c->proc = 0;
       }
     #elif STRIDE
       int minPass = INT_MAX;
       struct proc *chosenProc = 0;
-      // Find the process with the lowest pass value, breaking ties by runtime and pid
       for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
         if (p->state != RUNNABLE)
           continue;
 
-        // Primary selection: lowest pass
         if ((p->pass < minPass) ||
             (p->pass == minPass && p->rtime < chosenProc->rtime) ||
             (p->pass == minPass && p->rtime == chosenProc->rtime && p->pid < chosenProc->pid)) {
@@ -407,20 +396,15 @@ scheduler(void)
         }
       }
 
-      // If a suitable process was found, run it
       if (chosenProc) {
         c->proc = chosenProc;
         switchuvm(chosenProc);
         chosenProc->state = RUNNING;
-
-        // Perform context switch
         swtch(&(c->scheduler), chosenProc->context);
         switchkvm();
 
-        // Update the process's pass value after it has run
         // chosenProc->pass += chosenProc->stride;
         chosenProc->rtime = chosenProc->rtime + 1;
-        // Reset CPU's proc pointer to null after the process yields or finishes
         c->proc = 0;
       }
     #endif
