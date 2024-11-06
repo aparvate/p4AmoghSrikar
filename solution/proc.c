@@ -8,8 +8,6 @@
 #include "spinlock.h"
 #include "pstat.h"
 
-uint ticks;
-
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
