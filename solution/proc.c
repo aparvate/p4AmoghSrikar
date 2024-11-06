@@ -98,7 +98,7 @@ found:
   //p->pass = global_pass;
   p->pass = global_pass;
   p->tickets = 8;
-  p->stride = STRIDE1/p->tickets;
+  p->stride = STRIDE1/8;
   p->remain = p->stride;
 
   global_tickets += p->tickets;
@@ -232,7 +232,7 @@ fork(void)
   acquire(&ptable.lock);
 
   np->tickets = 8;          
-  np->stride = STRIDE1 / np->tickets;     
+  np->stride = STRIDE1 / 8;     
   np->pass = global_pass;                
   np->remain = 0;
   np->rtime = 0;
