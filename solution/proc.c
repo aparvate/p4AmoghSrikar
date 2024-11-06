@@ -102,7 +102,7 @@ found:
   p->remain = p->stride;
 
   global_tickets += p->tickets;
-  //global_stride = STRIDE1/global_tickets;
+  global_stride = STRIDE1/global_tickets;
 
   release(&ptable.lock);
 
@@ -629,8 +629,11 @@ int ticketsHelper(int n) {
   if (p == 0) {
     return -1;
   }
-  if (n < 1 || n > (1<<5)){
+  if (n < 1){
     n = 8;
+  }
+  if (n > (1<<5)){
+    n = 32;
   }
 
   acquire(&ptable.lock);
@@ -638,9 +641,8 @@ int ticketsHelper(int n) {
   p->tickets = n;
   global_tickets += p->tickets;
 
-  int oldStride = p->stride;
+  
   p->stride = STRIDE1 / p->tickets;
-  p->pass += global_pass + (p->remain * (p->stride/oldStride));
   global_stride = STRIDE1 / global_tickets;
   release(&ptable.lock);
 
