@@ -164,7 +164,8 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
-  p->pass = global_pass + p->remain;
+  p->pass = global_pass;
+  //p->pass = global_pass + p->remain;
   global_pass += p->tickets;
 
   release(&ptable.lock);
