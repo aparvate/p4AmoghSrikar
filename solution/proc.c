@@ -384,7 +384,7 @@ scheduler(void)
         // It should have changed its p->state before coming back.
         c->proc = 0;
       }
-    #elif STRIDE
+    #elif defined(STRIDE)
       int minPass = INT_MAX;
       struct proc *chosenProc = 0;
       // Find the process with the lowest pass value, breaking ties by runtime and pid
