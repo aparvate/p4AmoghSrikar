@@ -132,14 +132,6 @@ found:
   return p;
 }
 
-void global_pass_update(void){
-  static int lastUpdated = 0;
-  int timeGone;
-  timeGone = ticks - lastUpdated;
-  lastUpdated += timeGone;
-  global_pass += (global_stride * timeGone);
-}
-
 //PAGEBREAK: 32
 // Set up first user process.
 void
@@ -392,7 +384,7 @@ scheduler(void)
         // It should have changed its p->state before coming back.
         c->proc = 0;
       }
-    #elif defined(STRIDE)
+    #elif STRIDE
       int minPass = INT_MAX;
       struct proc *chosenProc = 0;
       // Find the process with the lowest pass value, breaking ties by runtime and pid
@@ -583,10 +575,9 @@ kill(int pid)
     if(p->pid == pid){
       p->killed = 1;
       // Wake process from sleep if necessary.
-      if(p->state == SLEEPING) {
+      if(p->state == SLEEPING)
         p->state = RUNNABLE;
         global_pass_update();
-      }
       release(&ptable.lock);
       return 0;
     }
@@ -681,4 +672,12 @@ int getpinfo(struct pstat *ps) {
   release(&ptable.lock);
 
   return 0;
+}
+
+void global_pass_update(void){
+  static int lastUpdated = 0;
+  int timeGone;
+  timeGone = ticks - lastUpdated;
+  lastUpdated += timeGone;
+  global_pass += (global_stride * timeGone);
 }
