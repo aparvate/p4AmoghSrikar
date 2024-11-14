@@ -1,4 +1,4 @@
-# Wisconsin Shell
+# Wisconsin Scheduler
 
 ## Updates
 
